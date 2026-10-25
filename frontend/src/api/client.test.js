@@ -1,24 +1,23 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createClient } from './client.js';
-import { createMockEngine } from '../game/mockEngine.js';
+import { createFakeServer } from '../test/fakeServer.js';
 
-const engine = createMockEngine();
-const sample = () => engine.reset();
+const sample = () => createFakeServer().reset();
+const okFetch = () => vi.fn(async () => ({ ok: true, json: async () => sample() }));
 
 describe('createClient', () => {
-  it('uses the mock engine when no backend URL is set', async () => {
-    const client = createClient({ baseUrl: '' });
-    expect(client.mode).toBe('mock');
+  it('uses /api when no backend URL is set', async () => {
+    const fetchImpl = okFetch();
+    const client = createClient({ fetchImpl });
+    expect(client.baseUrl).toBe('/api');
     const s = await client.reset();
     expect(s.tick).toBe(0);
-    const s2 = await client.step();
-    expect(s2.tick).toBe(1);
+    expect(fetchImpl).toHaveBeenCalledWith('/api/reset', expect.objectContaining({ method: 'POST' }));
   });
 
-  it('calls the backend endpoints when a URL is set', async () => {
-    const fetchImpl = vi.fn(async () => ({ ok: true, json: async () => sample() }));
+  it('calls the backend endpoints on the given URL', async () => {
+    const fetchImpl = okFetch();
     const client = createClient({ baseUrl: 'http://localhost:8000/api/', fetchImpl });
-    expect(client.mode).toBe('live');
     await client.reset();
     await client.step();
     await client.getState();
@@ -37,9 +36,14 @@ describe('createClient', () => {
     await expect(client.reset()).rejects.toThrow(/Can't reach the game server at \/api/);
   });
 
+  it('treats a proxy 502 as the backend being down', async () => {
+    const client = createClient({ baseUrl: '/api', fetchImpl: async () => ({ ok: false, status: 502 }) });
+    await expect(client.reset()).rejects.toThrow(/Can't reach the game server at \/api\. Check that the backend is running/);
+  });
+
   it('reports HTTP errors and bad JSON', async () => {
     const bad = createClient({ baseUrl: '/api', fetchImpl: async () => ({ ok: false, status: 500 }) });
-    await expect(bad.step()).rejects.toThrow(/answered 500 to POST \/step/);
+    await expect(bad.step()).rejects.toThrow(/answered 500 to POST \/step\. Check that the backend is running/);
     const notJson = createClient({
       baseUrl: '/api',
       fetchImpl: async () => ({ ok: true, json: async () => { throw new SyntaxError('x'); } }),

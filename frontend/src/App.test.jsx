@@ -2,11 +2,9 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App.jsx';
-import { createClient } from './api/client.js';
+import { createFakeClient } from './test/fakeServer.js';
 
-const mockClient = () => createClient({ baseUrl: '' });
-
-async function renderApp(client = mockClient()) {
+async function renderApp(client = createFakeClient()) {
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
   render(<App client={client} />);
   await screen.findByText('PRESS START');
@@ -20,18 +18,19 @@ describe('App', () => {
   it('loads the board with the HUD and waits for start', async () => {
     await renderApp();
     expect(screen.getByRole('heading', { name: 'PAC-AGENT' })).toBeInTheDocument();
-    expect(screen.getByText('MOCK DATA')).toBeInTheDocument();
     expect(screen.getByTestId('score')).toHaveTextContent('000000');
-    expect(screen.getByTestId('coins')).toHaveTextContent('00/06');
+    expect(screen.getByTestId('coins')).toHaveTextContent('00/01');
     expect(screen.getByTestId('moves')).toHaveTextContent('0000');
-    expect(screen.getByTestId('agent-pos')).toHaveTextContent('(9,10)');
-    expect(screen.getByRole('img', { name: /Maze, 15 rows by 21 columns/ })).toBeInTheDocument();
+    expect(screen.getByTestId('agent-pos')).toHaveTextContent('(1,1)');
+    expect(screen.getByRole('img', { name: /Maze, 5 rows by 7 columns/ })).toBeInTheDocument();
   });
 
   it('steps one move at a time with STEP', async () => {
     const user = await renderApp();
     await user.click(screen.getByRole('button', { name: 'Step one move' }));
     expect(await screen.findByTestId('moves')).toHaveTextContent('0001');
+    expect(screen.getByTestId('agent-pos')).toHaveTextContent('(1,2)');
+    expect(screen.getByTestId('score')).toHaveTextContent('000010');
     expect(screen.getByText('PAUSED')).toBeInTheDocument();
   });
 
@@ -88,9 +87,8 @@ describe('App', () => {
 
   it('shows NO SIGNAL with a retry when the backend is down', async () => {
     let up = false;
-    const sample = mockClient();
+    const sample = createFakeClient();
     const client = {
-      mode: 'live',
       reset: vi.fn(async () => {
         if (!up) throw new Error("Can't reach the game server at /api. Check that the backend is running.");
         return sample.reset();
@@ -101,7 +99,7 @@ describe('App', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<App client={client} />);
     expect(await screen.findByText('NO SIGNAL')).toBeInTheDocument();
-    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.getByText(/Can't reach the game server/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'START' })).toBeDisabled();
     up = true;
     const status = screen.getByRole('status');

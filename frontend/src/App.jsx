@@ -48,9 +48,6 @@ export default function App({ client: injectedClient } = {}) {
             <div className="marquee">
               <h1 className="marquee-title">PAC-AGENT</h1>
               <div className="marquee-sub">THE MAZE THAT PLAYS ITSELF</div>
-              <span className={`marquee-sticker ${client.mode === 'live' ? 'is-live' : ''}`}>
-                {client.mode === 'live' ? 'LIVE' : 'MOCK DATA'}
-              </span>
             </div>
 
             <div className="cabinet-body">
