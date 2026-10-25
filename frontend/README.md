@@ -42,7 +42,7 @@ src/
   game/derive.js          turns state into what each maze cell draws
   hooks/useGame.js        game loop: start, pause, step, reset
   hooks/useHighScore.js   best score, saved in the browser
-  components/             cabinet, screen, maze, panels, controls, sprites, background
+  assets/                 UI components: cabinet, screen, maze, panels, controls, sprites, background
   styles/                 theme tokens and component styles
   config.js               team names shown in the footer
   test/                   test setup and a small fake server used only by the tests

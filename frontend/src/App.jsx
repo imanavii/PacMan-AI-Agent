@@ -3,11 +3,11 @@ import { createClient } from './api/client.js';
 import { useGame } from './hooks/useGame.js';
 import { useHighScore } from './hooks/useHighScore.js';
 import { buildCells } from './game/derive.js';
-import { Screen, ScreenOverlay } from './components/Screen.jsx';
-import { BoardPanel, LegendPanel } from './components/Panels.jsx';
-import { ControlPanel } from './components/ControlPanel.jsx';
-import { DEFAULT_TOGGLES, FRAME_SIZES } from './components/options.js';
-import { Background, Parade } from './components/Ambient.jsx';
+import { Screen, ScreenOverlay } from './assets/Screen.jsx';
+import { BoardPanel, LegendPanel } from './assets/Panels.jsx';
+import { ControlPanel } from './assets/ControlPanel.jsx';
+import { DEFAULT_TOGGLES, FRAME_SIZES } from './assets/options.js';
+import { Background, Parade } from './assets/Ambient.jsx';
 import { COURSE_LABEL, TEAM_NAMES } from './config.js';
 
 function pickOverlay(game) {
