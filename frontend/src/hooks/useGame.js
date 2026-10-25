@@ -33,7 +33,7 @@ export function useGame(client, { tickMs = TICK_MS } = {}) {
     }
   }, []);
 
-  // Load the opening state from the game server (or the mock engine).
+  // Load the opening state from the game server.
   useEffect(() => {
     // oxlint-disable-next-line react/set-state-in-effect -- fetching from an external system
     call(() => client.reset());

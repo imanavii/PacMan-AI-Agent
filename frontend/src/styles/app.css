@@ -122,19 +122,6 @@
   letter-spacing: 2px;
   color: var(--c-orange);
 }
-.marquee-sticker {
-  position: absolute;
-  top: -12px;
-  right: -14px;
-  padding: 6px 10px;
-  font-family: var(--f-pixel);
-  font-size: 12px;
-  color: var(--c-ink);
-  background: var(--c-paper);
-  transform: rotate(6deg);
-  box-shadow: 3px 3px 0 var(--c-void);
-}
-.marquee-sticker.is-live { background: var(--c-green); }
 
 .cabinet-body {
   padding: 22px 24px 24px;
