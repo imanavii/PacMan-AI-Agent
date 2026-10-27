@@ -1,0 +1,106 @@
+/* Pac-Agent design tokens (locked design v4). */
+:root {
+  /* Palette */
+  --c-night: #181425;
+  --c-void: #0d0b14;
+  --c-panel: #262b44;
+  --c-panel-hi: #3a4466;
+  --c-panel-edge: #5a6988;
+  --c-text: #c0cbdc;
+  --c-text-dim: #8b9bb4;
+  --c-white: #ffffff;
+  --c-yellow: #fee761;
+  --c-orange: #feae34;
+  --c-orange-deep: #f77622;
+  --c-red: #e43b44;
+  --c-red-deep: #9e2835;
+  --c-pink: #f6757a;
+  --c-cyan: #2ce8f5;
+  --c-blue: #0099db;
+  --c-blue-deep: #124e89;
+  --c-green: #63c74d;
+  --c-paper: #ead4aa;
+  --c-ink: #3e2731;
+
+  /* Type */
+  --f-pixel: 'Silkscreen', monospace;
+  --f-digits: 'VT323', monospace;
+  --f-mono: 'IBM Plex Mono', monospace;
+  --f-hand: 'Caveat', cursive;
+
+  /* Layout */
+  --cabinet-max: 1280px;
+  --tile: 29px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--c-night);
+  color: var(--c-text);
+  font-family: var(--f-mono);
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--c-cyan);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes amb-twinkle {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
+}
+@keyframes amb-rise {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1600px); }
+}
+@keyframes amb-orbit {
+  0% { left: 0; top: 0; }
+  25% { left: 100%; top: 0; }
+  50% { left: 100%; top: 100%; }
+  75% { left: 0; top: 100%; }
+  100% { left: 0; top: 0; }
+}
+@keyframes amb-face-r { 0%, 24.9% { opacity: 1; } 25%, 100% { opacity: 0; } }
+@keyframes amb-face-d { 0%, 24.9% { opacity: 0; } 25%, 49.9% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes amb-face-l { 0%, 49.9% { opacity: 0; } 50%, 74.9% { opacity: 1; } 75%, 100% { opacity: 0; } }
+@keyframes amb-face-u { 0%, 74.9% { opacity: 0; } 75%, 100% { opacity: 1; } }
+@keyframes amb-chomp { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes amb-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient *,
+  .parade,
+  .parade *,
+  .anim-chomp {
+    animation: none !important;
+  }
+  .parade {
+    display: none;
+  }
+}
