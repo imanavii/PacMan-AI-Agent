@@ -4,14 +4,14 @@ Autonomous Pac-Man AI project with a React arcade interface for visualizing an a
 
 ## Current status
 
-The React frontend is implemented. The Python entry point, game engine, AI algorithms, evaluation modules, and Python dependency manifest are placeholders. The original project description proposed a Pygame GUI; this interface uses React and Vite instead.
+The React frontend and basic Python maze/game state are implemented. The HTTP server, ghost movement, AI algorithms, evaluation modules, and Python dependency manifest remain placeholders. GameState.step(action) currently accepts an explicit direction; it does not select agent moves. The original project description proposed a Pygame GUI; this interface uses React and Vite instead.
 
 The frontend needs a game server to play. Without it, the interface shows **NO SIGNAL** and offers a retry. Test fixtures are used only by tests; they are not a production game engine.
 
 ## Project structure
 
 - `agents/`: Python agent interfaces and BFS, A*, and Minimax implementations (placeholders).
-- `game/`: Python entities, maze, state, and renderer (placeholders).
+- `game/`: maze layout, legal movement, and game state; entities and renderer remain placeholders.
 - `evaluation/`: Python benchmarks and metrics (placeholders).
 - `results/`: destination for evaluation results.
 - `main.py`: Python backend entry point (placeholder).
@@ -41,7 +41,13 @@ To change the server address, copy `ui/.env.example` to `ui/.env.local` and conf
 
 ## Validation
 
-Run from `ui/`:
+Run the Python maze and state tests from the repository root (no third-party dependencies required):
+
+```sh
+python -m unittest discover -s tests -v
+```
+
+Run frontend checks from `ui/`:
 
 ```sh
 npm run lint
