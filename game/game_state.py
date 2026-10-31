@@ -1,7 +1,7 @@
 """Game rules and snapshots, independent of agents and the HTTP server."""
 
-from game.maze import Maze
-from game.entities import GHOST_IDS, STEP_MS, ghost_mode, ghost_target, move_ghost
+from game.maze import Maze, DIRECTIONS
+from game.entities import GHOST_IDS, STEP_MS, ghost_mode, ghost_target, move_ghost, exit_path
 
 
 class GameState:
@@ -24,6 +24,17 @@ class GameState:
         self.ghosts = tuple(sorted(self.maze.positions("G")))
         self.ghost_directions = ("LEFT",) * len(self.ghosts)
         self.ghost_elapsed_ms = 0
+        self.ghost_exit = next(iter(self.maze.positions("E")), None)
+        self.exit_routes = [exit_path(self.maze, pos, self.ghost_exit, set(self.ghosts) - {pos})
+                            if self.ghost_exit else [] for pos in self.ghosts]
+        self.ghost_house = set()
+        pending = list(self.ghosts) if self.ghost_exit else []
+        while pending:
+            pos = pending.pop()
+            if pos in self.ghost_house or pos[0] <= self.ghost_exit[0]:
+                continue
+            self.ghost_house.add(pos)
+            pending.extend(self.maze.move(pos, action) for action in DIRECTIONS)
 
     def step(self, action):
         """Move Pac-Man and all ghosts one tile, then resolve collisions."""
@@ -40,9 +51,16 @@ class GameState:
         blinky = previous_ghosts[0] if previous_ghosts else destination
         shape = (len(self.maze.layout), len(self.maze.layout[0]))
         moves = []
-        for ghost_id, pos, direction in zip(GHOST_IDS, self.ghosts, self.ghost_directions):
-            target = ghost_target(ghost_id, pos, destination, self.direction, blinky, shape, mode)
-            moves.append(move_ghost(self.maze, pos, direction, target, mode != previous_mode))
+        leader = next((i for i, route in enumerate(self.exit_routes) if route), None)
+        for i, (ghost_id, pos, direction) in enumerate(zip(GHOST_IDS, self.ghosts, self.ghost_directions)):
+            if self.exit_routes[i]:
+                new = self.exit_routes[i].popleft() if i == leader else pos
+                delta = (new[0] - pos[0], new[1] - pos[1])
+                heading = next((action for action, offset in DIRECTIONS.items() if offset == delta), direction)
+                moves.append((new, heading))
+            else:
+                target = ghost_target(ghost_id, pos, destination, self.direction, blinky, shape, mode)
+                moves.append(move_ghost(self.maze, pos, direction, target, mode != previous_mode, self.ghost_house))
         self.ghosts = tuple(pos for pos, _ in moves)
         self.ghost_directions = tuple(direction for _, direction in moves)
         self.pacman = destination

@@ -10,9 +10,13 @@ from game.maze import DIRECTIONS
 def search(game):
     reverse = ghost_mode(game.ghost_elapsed_ms + STEP_MS) != ghost_mode(game.ghost_elapsed_ms)
     responses = []
-    for pos, direction in zip(game.ghosts, game.ghost_directions):
+    leader = next((i for i, route in enumerate(game.exit_routes) if route), None)
+    for i, (pos, direction) in enumerate(zip(game.ghosts, game.ghost_directions)):
+        if game.exit_routes[i]:
+            responses.append([game.exit_routes[i][0] if i == leader else pos])
+            continue
         legal = [(action, game.maze.move(pos, action)) for action in DIRECTIONS]
-        legal = [(action, new) for action, new in legal if new != pos]
+        legal = [(action, new) for action, new in legal if new != pos and new not in game.ghost_house]
         backwards = [(action, new) for action, new in legal if action == REVERSE[direction]]
         forward = [(action, new) for action, new in legal if action != REVERSE[direction]]
         allowed = (backwards or legal) if reverse else (forward or legal)

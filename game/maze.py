@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 DIRECTIONS = {"UP": (-1, 0), "DOWN": (1, 0), "LEFT": (0, -1), "RIGHT": (0, 1)}
 # Classic-style 28-column, 31-row board. The central doorway stays open
-# so ghosts can leave without introducing a separate ghost-house rule.
+# E marks the shared exit used before normal ghost targeting begins.
 DEFAULT_LAYOUT = (
     "############################",
     "#............##............#",
@@ -17,7 +17,7 @@ DEFAULT_LAYOUT = (
     "#......##....##....##......#",
     "######.##### ## #####.######",
     "######.##### ## #####.######",
-    "######.##          ##.######",
+    "######.##    E     ##.######",
     "######.## ###  ### ##.######",
     "######.## #      # ##.######",
     "......    # GGGG #    ......",
@@ -51,8 +51,10 @@ class Maze:
         width = len(self.layout[0])
         if not width or any(len(row) != width for row in self.layout):
             raise ValueError("Maze rows must have the same nonzero width")
-        if any(cell not in "# .oPG" for row in self.layout for cell in row):
+        if any(cell not in "# .oPGE" for row in self.layout for cell in row):
             raise ValueError("Maze contains an unknown tile")
+        if len(self.positions("E")) > 1:
+            raise ValueError("Maze supports one shared ghost exit")
         if len(self.positions("G")) > 4:
             raise ValueError("Maze supports at most four ghosts")
         if len(self.positions("P")) != 1:
