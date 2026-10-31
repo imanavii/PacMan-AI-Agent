@@ -4,14 +4,14 @@ Autonomous Pac-Man AI project with a React arcade interface for visualizing an a
 
 ## Current status
 
-The React frontend and basic Python maze/game state are implemented. The HTTP server, ghost movement, AI algorithms, evaluation modules, and Python dependency manifest remain placeholders. GameState.step(action) currently accepts an explicit direction; it does not select agent moves. The original project description proposed a Pygame GUI; this interface uses React and Vite instead.
+The React frontend and basic Python maze/game state are implemented. Four ghosts now move with classic chase targets and scatter/chase modes. The HTTP server, AI algorithms, evaluation modules, and Python dependency manifest remain placeholders. GameState.step(action) currently accepts an explicit direction; it does not select agent moves. The original project description proposed a Pygame GUI; this interface uses React and Vite instead.
 
 The frontend needs a game server to play. Without it, the interface shows **NO SIGNAL** and offers a retry. Test fixtures are used only by tests; they are not a production game engine.
 
 ## Project structure
 
 - `agents/`: Python agent interfaces and BFS, A*, and Minimax implementations (placeholders).
-- `game/`: maze layout, legal movement, and game state; entities and renderer remain placeholders.
+- `game/`: maze layout, legal movement, ghost behavior, and game state; renderer remains a placeholder.
 - `evaluation/`: Python benchmarks and metrics (placeholders).
 - `results/`: destination for evaluation results.
 - `main.py`: Python backend entry point (placeholder).
@@ -24,6 +24,14 @@ The frontend needs a game server to play. Without it, the interface shows **NO S
 - `ui/src/styles/`: application styles and theme.
 - `ui/src/test/`: test-only server fixture and setup.
 - `ui/dashboard.py`: original empty placeholder, retained to preserve the canonical structure.
+
+## Ghost behavior
+
+`game/entities.py` implements Blinky (red), Pinky (pink), Inky (cyan), and Clyde (orange). The default maze has four `G` starts, assigned those identities in row/column order. Custom mazes can have zero to four ghosts.
+
+Ghosts move one tile per step using squared distance to their target. Ties prefer up, left, down, right; normal movement avoids reversing unless at a dead end. Mode switches force a reversal when legal. The level-one schedule is scatter/chase for 7/20/7/20/5/20/5 seconds, then continuous chase. Each simulation step represents 350 ms; pausing the UI does not advance the clock. Losing a life resets positions, headings, and the mode clock, preserving score and remaining collectibles.
+
+The target rules follow [The Pac-Man Dossier](https://phil.rodgers.ai/pacmandossier/), including Pinky and Inky's upward-targeting quirk. This is a tile-based adaptation to our small maze, not a full arcade emulator: there is no ghost house/release timing, frightened mode, tunnel speed adjustment, Cruise Elroy, or original-map turn restrictions. Coins remain collectibles, not power pellets. Ghost moves use the same pre-move Blinky position and the updated Pac-Man position; collisions include shared destinations and tile swaps.
 
 ## Frontend setup
 

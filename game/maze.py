@@ -7,7 +7,7 @@ DEFAULT_LAYOUT = (
     "###########",
     "#P...#...o#",
     "#.##.#.##.#",
-    "#....G....#",
+    "#..GGGG...#",
     "#.##.#.##.#",
     "#o...#....#",
     "###########",
@@ -27,6 +27,8 @@ class Maze:
             raise ValueError("Maze rows must have the same nonzero width")
         if any(cell not in "# .oPG" for row in self.layout for cell in row):
             raise ValueError("Maze contains an unknown tile")
+        if len(self.positions("G")) > 4:
+            raise ValueError("Maze supports at most four ghosts")
         if len(self.positions("P")) != 1:
             raise ValueError("Maze must have exactly one Pac-Man start (P)")
 

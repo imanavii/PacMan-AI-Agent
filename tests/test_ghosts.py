@@ -1,6 +1,7 @@
 import unittest
 
-from game.entities import ghost_target
+from game.entities import ghost_target, ghost_mode, move_ghost
+from game.maze import Maze
 
 
 class GhostTargetTests(unittest.TestCase):
@@ -35,3 +36,29 @@ class GhostTargetTests(unittest.TestCase):
     def test_rejects_unknown_mode(self):
         with self.assertRaises(ValueError):
             self.target("red", mode="invalid")
+
+
+class GhostMovementTests(unittest.TestCase):
+    def test_tie_breaking_prefers_up_then_left(self):
+        maze = Maze(("P  ", "   ", "   "))
+        self.assertEqual(move_ghost(maze, (1, 1), "UP", (0, 0)), ((0, 1), "UP"))
+        self.assertEqual(move_ghost(maze, (1, 1), "LEFT", (2, 0)), ((1, 0), "LEFT"))
+
+    def test_no_reverse_except_dead_end_or_mode_change(self):
+        maze = Maze(("P  ",))
+        self.assertEqual(move_ghost(maze, (0, 1), "RIGHT", (0, 0)), ((0, 2), "RIGHT"))
+        self.assertEqual(move_ghost(maze, (0, 2), "RIGHT", (0, 2)), ((0, 1), "LEFT"))
+        self.assertEqual(move_ghost(maze, (0, 1), "RIGHT", (0, 2), reverse=True), ((0, 0), "LEFT"))
+
+    def test_isolated_ghost_stays_put(self):
+        maze = Maze(("P#G",))
+        self.assertEqual(move_ghost(maze, (0, 2), "LEFT", (0, 0)), ((0, 2), "LEFT"))
+
+    def test_level_one_mode_schedule_boundaries(self):
+        boundaries = ((0, "scatter"), (6999, "scatter"), (7000, "chase"),
+                      (27000, "scatter"), (34000, "chase"), (54000, "scatter"),
+                      (59000, "chase"), (79000, "scatter"), (84000, "chase"),
+                      (1000000, "chase"))
+        for elapsed, expected in boundaries:
+            with self.subTest(elapsed=elapsed):
+                self.assertEqual(ghost_mode(elapsed), expected)

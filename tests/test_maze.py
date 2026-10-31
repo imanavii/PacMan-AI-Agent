@@ -7,7 +7,7 @@ class MazeTests(unittest.TestCase):
     def test_default_tiles_and_starts(self):
         maze = Maze()
         self.assertEqual(maze.start, (1, 1))
-        self.assertEqual(maze.positions("G"), {(3, 5)})
+        self.assertEqual(maze.positions("G"), {(3, 3), (3, 4), (3, 5), (3, 6)})
         self.assertEqual(len(maze.positions("o")), 2)
         self.assertTrue(all(set(row) <= {"#", " "} for row in maze.grid))
 
@@ -22,7 +22,7 @@ class MazeTests(unittest.TestCase):
             maze.move((0, 0), "DIAGONAL")
 
     def test_rejects_invalid_layouts(self):
-        for layout in ((), ("",), ("P.", "."), ("..",), ("PP",), ("PX",), (None,)):
+        for layout in ((), ("",), ("P.", "."), ("..",), ("PP",), ("PX",), (None,), ("PGGGGG",)):
             with self.subTest(layout=layout), self.assertRaises(ValueError):
                 Maze(layout)
 
