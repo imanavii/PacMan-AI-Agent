@@ -1,0 +1,64 @@
+import unittest
+
+from game.entities import ghost_target, ghost_mode, move_ghost
+from game.maze import Maze
+
+
+class GhostTargetTests(unittest.TestCase):
+    def target(self, ghost_id, pos=(1, 1), pacman=(10, 10), direction="RIGHT", blinky=(5, 6), mode="chase"):
+        return ghost_target(ghost_id, pos, pacman, direction, blinky, (21, 23), mode)
+
+    def test_blinky_targets_pacman(self):
+        self.assertEqual(self.target("red"), (10, 10))
+
+    def test_pinky_looks_four_tiles_ahead(self):
+        for direction, expected in (("RIGHT", (10, 14)), ("LEFT", (10, 6)),
+                                    ("DOWN", (14, 10)), ("UP", (6, 6))):
+            with self.subTest(direction=direction):
+                self.assertEqual(self.target("pink", direction=direction), expected)
+
+    def test_inky_uses_blinky_and_two_tiles_ahead(self):
+        self.assertEqual(self.target("cyan"), (15, 18))
+        self.assertEqual(self.target("cyan", blinky=(7, 8)), (13, 16))
+        self.assertEqual(self.target("cyan", direction="UP"), (11, 10))
+
+    def test_clyde_switches_at_eight_tile_euclidean_distance(self):
+        self.assertEqual(self.target("orange", pos=(10, 2)), (10, 10))
+        self.assertEqual(self.target("orange", pos=(10, 3)), (21, 0))
+        self.assertEqual(self.target("orange", pos=(5, 5)), (21, 0))
+
+    def test_scatter_targets_are_four_distinct_corners(self):
+        expected = {"red": (-1, 22), "pink": (-1, 0), "cyan": (21, 22), "orange": (21, 0)}
+        for ghost_id, corner in expected.items():
+            with self.subTest(ghost=ghost_id):
+                self.assertEqual(self.target(ghost_id, mode="scatter"), corner)
+
+    def test_rejects_unknown_mode(self):
+        with self.assertRaises(ValueError):
+            self.target("red", mode="invalid")
+
+
+class GhostMovementTests(unittest.TestCase):
+    def test_tie_breaking_prefers_up_then_left(self):
+        maze = Maze(("P  ", "   ", "   "))
+        self.assertEqual(move_ghost(maze, (1, 1), "UP", (0, 0)), ((0, 1), "UP"))
+        self.assertEqual(move_ghost(maze, (1, 1), "LEFT", (2, 0)), ((1, 0), "LEFT"))
+
+    def test_no_reverse_except_dead_end_or_mode_change(self):
+        maze = Maze(("P  ",))
+        self.assertEqual(move_ghost(maze, (0, 1), "RIGHT", (0, 0)), ((0, 2), "RIGHT"))
+        self.assertEqual(move_ghost(maze, (0, 2), "RIGHT", (0, 2)), ((0, 1), "LEFT"))
+        self.assertEqual(move_ghost(maze, (0, 1), "RIGHT", (0, 2), reverse=True), ((0, 0), "LEFT"))
+
+    def test_isolated_ghost_stays_put(self):
+        maze = Maze(("P#G",))
+        self.assertEqual(move_ghost(maze, (0, 2), "LEFT", (0, 0)), ((0, 2), "LEFT"))
+
+    def test_level_one_mode_schedule_boundaries(self):
+        boundaries = ((0, "scatter"), (6999, "scatter"), (7000, "chase"),
+                      (27000, "scatter"), (34000, "chase"), (54000, "scatter"),
+                      (59000, "chase"), (79000, "scatter"), (84000, "chase"),
+                      (1000000, "chase"))
+        for elapsed, expected in boundaries:
+            with self.subTest(elapsed=elapsed):
+                self.assertEqual(ghost_mode(elapsed), expected)
