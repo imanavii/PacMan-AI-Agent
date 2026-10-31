@@ -27,7 +27,7 @@ The frontend needs a game server to play. Without it, the interface shows **NO S
 
 ## Ghost behavior
 
-`game/entities.py` implements Blinky (red), Pinky (pink), Inky (cyan), and Clyde (orange). The default maze has four `G` starts, assigned those identities in row/column order. Custom mazes can have zero to four ghosts.
+`game/entities.py` implements Blinky (red), Pinky (pink), Inky (cyan), and Clyde (orange). The default maze has four `G` starts, assigned those identities in row/column order. Custom mazes can have zero to four ghosts. The default board marks a shared doorway with `E`: ghosts exit one at a time in red, pink, cyan, orange order before their targeting rules activate. Exited ghosts cannot re-enter the base. Reset and life loss restart the queue; maps without `E` use normal movement immediately.
 
 Ghosts move one tile per step using squared distance to their target. Ties prefer up, left, down, right; normal movement avoids reversing unless at a dead end. Mode switches force a reversal when legal. The level-one schedule is scatter/chase for 7/20/7/20/5/20/5 seconds, then continuous chase. Each simulation step represents 350 ms; pausing the UI does not advance the clock. Losing a life resets positions, headings, and the mode clock, preserving score and remaining collectibles.
 

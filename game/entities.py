@@ -1,5 +1,7 @@
 """Classic ghost target tiles, adapted to the current maze dimensions."""
 
+from collections import deque
+
 from game.maze import DIRECTIONS
 
 GHOST_IDS = ("red", "pink", "cyan", "orange")
@@ -50,9 +52,9 @@ def ghost_mode(elapsed_ms):
     return "chase"
 
 
-def move_ghost(maze, pos, direction, target, reverse=False):
+def move_ghost(maze, pos, direction, target, reverse=False, blocked=()):
     legal = [(action, maze.move(pos, action)) for action in TURN_ORDER]
-    legal = [(action, destination) for action, destination in legal if destination != pos]
+    legal = [(action, destination) for action, destination in legal if destination != pos and destination not in blocked]
     backwards = REVERSE[direction]
     if reverse:
         for action, destination in legal:
@@ -64,3 +66,23 @@ def move_ghost(maze, pos, direction, target, reverse=False):
         return pos, direction
     action, destination = min(choices, key=lambda choice: distance_squared(choice[1], target))
     return destination, action
+
+
+def exit_path(maze, start, exit_pos, occupied):
+    """Route a ghost to the shared exit, around the waiting ghosts."""
+    queue = deque([start])
+    parents = {start: None}
+    while queue:
+        pos = queue.popleft()
+        if pos == exit_pos:
+            route = []
+            while pos != start:
+                route.append(pos)
+                pos = parents[pos]
+            return deque(reversed(route))
+        for action in DIRECTIONS:
+            new = maze.move(pos, action)
+            if new not in parents and new not in occupied:
+                parents[new] = pos
+                queue.append(new)
+    raise ValueError("Ghost start cannot reach the shared exit")
