@@ -33,10 +33,10 @@ const MemoCell = memo(Cell, (a, b) => {
   );
 });
 
-export function Maze({ cells, rows, cols, tile, showCoords, crt, label, dir, mouth, overlay }) {
+export function Maze({ cells, rows, cols, showCoords, crt, label, dir, mouth, overlay }) {
   return (
-    // Shrink tiles on narrow screens so the whole maze always fits the width.
-    <div className="maze-wrap" style={{ '--tile': `min(${tile}px, calc((100vw - ${showCoords ? 122 : 100}px) / ${cols}))` }}>
+    // Fit square tiles to both dimensions of the board container.
+    <div className="maze-wrap" style={{ '--tile': `min(calc((100cqw - ${showCoords ? 22 : 0}px) / ${cols}), calc((100cqh - ${showCoords ? 22 : 0}px) / ${rows}))` }}>
       {showCoords && (
         <div className="maze-cols" aria-hidden="true">
           {Array.from({ length: cols }, (_, i) => (
