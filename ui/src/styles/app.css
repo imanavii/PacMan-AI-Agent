@@ -20,8 +20,8 @@ button:focus-visible { outline: 2px solid #ae80ff; outline-offset: 3px; }
 .life-hearts { display: flex; gap: 7px; line-height: 1; }
 .heart { font-size: 28px; color: #30374d; }
 .heart.active { color: #f45578; }
-.game-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; min-height: 0; gap: 16px; }
-.screen { width: 100%; height: 100%; min-width: 0; min-height: 0; position: relative; padding: 12px; background: #030714; border: 1px solid #243d84; border-radius: 15px; display: grid; place-items: center; container-type: size; }
+.game-workspace { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); min-height: 0; gap: 16px; }
+.screen { width: 100%; height: 100%; min-width: 0; min-height: 0; position: relative; padding: 0; background: transparent; border: 0; display: grid; place-items: center; container-type: size; }
 .screen-empty { min-height: 0; }
 .game-sidebar { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
 .info-panel { border: 1px solid #252c48; border-radius: 13px; background: #0e1429; padding: 12px 16px; min-width: 0; }
@@ -56,18 +56,18 @@ button:focus-visible { outline: 2px solid #ae80ff; outline-offset: 3px; }
 .sticker { font-size: 8px; color: #8c9bbc; white-space: nowrap; }
 .maze-wrap { display: flex; flex-direction: column; flex: none; }
 .maze-row { display: flex; }
-.maze-grid { position: relative; display: grid; grid-auto-rows: var(--tile); background: #030714; overflow: hidden; }
+.maze-grid { position: relative; display: grid; grid-auto-rows: var(--tile-y); background: #030714; overflow: hidden; }
 .maze-cols { display: flex; padding-left: 22px; height: 22px; }
-.maze-cols span { width: var(--tile); text-align: center; font-size: 9px; color: #7c8daf; }
+.maze-cols span { width: var(--tile-x); text-align: center; font-size: 9px; color: #7c8daf; }
 .maze-rows { width: 22px; flex: none; display: flex; flex-direction: column; }
-.maze-rows span { height: var(--tile); line-height: var(--tile); font-size: 9px; text-align: center; color: #7c8daf; }
+.maze-rows span { height: var(--tile-y); line-height: var(--tile-y); font-size: 9px; text-align: center; color: #7c8daf; }
 .cell { position: relative; }
 .cell > * { position: absolute; }
-.cell-wall { inset: 3%; background: #0a1737; box-shadow: inset 0 0 0 1px #285dff; }
+.cell-wall { inset: 0; background: #081026; border-style: solid; border-color: #285dff; }
 .cell-danger { inset: 0; background: #dc4d6830; }
 .cell-explored { inset: 0; background: #8a5ee733; }
 .cell-path { inset: 35%; background: #ac82f7; border-radius: 2px; }
-.cell-pellet { inset: 40%; background: #ffe363; border-radius: 50%; }
+.cell-pellet { left: 50%; top: 50%; width: calc(min(var(--tile-x), var(--tile-y)) * .2); height: calc(min(var(--tile-x), var(--tile-y)) * .2); transform: translate(-50%, -50%); background: #ffe363; border-radius: 50%; }
 .cell-coin { inset: 15%; width: 70%; height: 70%; }
 .cell-target { inset: 12%; border: 1px solid #6ddfa7; }
 .cell-pac { left: 5%; top: 7%; width: 90%; height: 86%; }
@@ -86,13 +86,13 @@ button:focus-visible { outline: 2px solid #ae80ff; outline-offset: 3px; }
   .game-sidebar { gap: 8px; }.display-toggles { margin-top: 7px; }
   .stat-card { padding: 7px 14px; }.stat-card strong { font-size: 23px; }
 }
-@media (max-width: 900px) { .game-workspace { grid-template-columns: minmax(0, 1fr) 240px; gap: 12px; }.app-subtitle { display: none; } }
+@media (max-width: 900px) { .game-workspace { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; }.app-subtitle { display: none; } }
 @media (max-width: 620px) {
   .game-app { padding: 6px; gap: 6px; grid-template-rows: 32px 55px minmax(0, 1fr) 14px; }
-  .game-workspace { grid-template-columns: minmax(0, 1fr) 175px; gap: 6px; }.stats-bar { gap: 5px; }
+  .game-workspace { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6px; }.stats-bar { gap: 5px; }
   .stat-card { padding: 6px 8px; }.stat-card > span { font-size: 10px; }.stat-card strong { font-size: 19px; }.heart { font-size: 22px; }
   .info-panel { padding: 8px; }.legend-list { grid-template-columns: 1fr; gap: 4px; }.legend-list li { font-size: 9px; }.legend-list li svg { width: 14px; height: 13px; }
   .control-main { gap: 4px; }.joystick-block { flex-basis: 65px; width: 65px; }.joystick { transform: scale(.48); margin-bottom: -65px; }
   .sticker { font-size: 6px; }.display-toggles { grid-template-columns: 1fr 1fr; }.connection { font-size: 9px; }.brand h1 { font-size: 12px; }.app-footer { font-size: 8px; }
-  .screen { padding: 5px; border-radius: 9px; }
+  .screen { padding: 0; }
 }
