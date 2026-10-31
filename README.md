@@ -4,17 +4,17 @@ Autonomous Pac-Man AI project with a React arcade interface for visualizing an a
 
 ## Current status
 
-The React frontend and basic Python maze/game state are implemented. Four ghosts now move with classic chase targets and scatter/chase modes. FastAPI now exposes the game state, reset, and step endpoints. A basic demo controller chooses Pac-Man moves until the real AI algorithms are connected; it favors less-visited cells, nearby food, and avoiding occupied ghost cells. It does not predict ghost movement or guarantee a win. AI algorithms and evaluation modules remain placeholders. The original project description proposed a Pygame GUI; this interface uses React and Vite instead.
+The React frontend and basic Python maze/game state are implemented. Four ghosts now move with classic chase targets and scatter/chase modes. FastAPI now exposes the game state, reset, and step endpoints. Pac-Man is autonomous: agent.py chooses Minimax near ghosts, BFS for nearby food, and A* for distant food. It replans each step and supplies route and search overlays, with random tie breaking between equal choices. Evaluation modules remain placeholders. The original project description proposed a Pygame GUI; this interface uses React and Vite instead.
 
 The frontend needs a game server to play. Without it, the interface shows **NO SIGNAL** and offers a retry. Test fixtures are used only by tests; they are not a production game engine.
 
 ## Project structure
 
-- `agents/`: Python agent interfaces and BFS, A*, and Minimax implementations (placeholders).
+- `agents/`: separate BFS, A*, and Minimax implementations, selected automatically by `agent.py`.
 - `game/`: maze layout, legal movement, ghost behavior, and game state; renderer remains a placeholder.
 - `evaluation/`: Python benchmarks and metrics (placeholders).
 - `results/`: destination for evaluation results.
-- `main.py`: FastAPI endpoints and the temporary demo controller.
+- `main.py`: FastAPI endpoints connecting the game and autonomous agent.
 - `requirements.txt`: backend runtime dependencies.
 - `ui/`: React frontend, its dependency manifest, and Vite configuration.
 - `ui/src/components/`: arcade controls, screen, maze, sprites, and decorative components.
@@ -33,6 +33,14 @@ Ghosts move one tile per step using squared distance to their target. Ties prefe
 
 The target rules follow [The Pac-Man Dossier](https://phil.rodgers.ai/pacmandossier/), including Pinky and Inky's upward-targeting quirk. This is a tile-based adaptation to our small maze, not a full arcade emulator: there is no ghost house/release timing, frightened mode, tunnel speed adjustment, Cruise Elroy, or original-map turn restrictions. Coins remain collectibles, not power pellets. Ghost moves use the same pre-move Blinky position and the updated Pac-Man position; collisions include shared destinations and tile swaps.
 
+## Pac-Man decisions
+
+`agents/agent.py` uses simple Manhattan-distance thresholds: Minimax when a ghost is within 3 tiles, BFS when food is within 4 tiles, and A* otherwise. These thresholds are constants in that file. If food search finds no route, it falls back to Minimax. No human algorithm or direction selection is required.
+
+BFS finds the nearest reachable food; A* uses distance to the nearest remaining food as its heuristic. Both treat occupied ghost tiles as blocked. Minimax is a short two-ply safety search: one Pac-Man move followed by the worst legal joint ghost response. It respects walls, ghost headings, and mode reversals, but pessimistically considers possible ghost turns rather than assuming their exact targets. This shallow lookahead does not guarantee survival or victory.
+
+Equally good routes and moves use random tie breaking, so repeated resets can produce different runs. A plan is cached until a step or reset so the displayed route matches the action that will actually be taken. Minimax displays only its selected next tile rather than pretending to have a long planned route.
+
 ## Backend setup
 
 From the repository root, using Python 3.11 or newer:
@@ -44,7 +52,7 @@ python -m uvicorn main:app --host 127.0.0.1 --port 8000
 
 Leave this terminal running and start the frontend in a second terminal. The server exposes `GET /api/state`, `POST /api/reset`, and `POST /api/step`, as described in [the API contract](ui/API_CONTRACT.md). Each step advances Pac-Man and all four ghosts; finished games remain unchanged until reset.
 
-This is one in-memory game shared by all connected browser tabs. Use one server worker. Reset or a server restart starts a fresh game; there is no database or separate user session. Requests through Vite's `/api` proxy need no CORS configuration. Agent overlays remain empty until the real agent provides search information.
+This is one in-memory game shared by all connected browser tabs. Use one server worker. Reset or a server restart starts a fresh game; there is no database or separate user session. Requests through Vite's `/api` proxy need no CORS configuration. Route, target, and searched-cell overlays show the current plan. The raw API response includes the selected algorithm in `agent.algorithm`.
 
 ## Frontend setup
 
