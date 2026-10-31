@@ -89,6 +89,7 @@ export function normalizeState(raw) {
       coins: isNum(totals.coins) ? totals.coins : coins.length,
     },
     agent: {
+      algorithm: typeof agent.algorithm === 'string' ? agent.algorithm : null,
       action,
       path: posList(agent.path, 'agent.path', false),
       exploredCells: posList(agent.explored_cells, 'agent.explored_cells', false),

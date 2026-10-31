@@ -55,6 +55,7 @@ export function buildCells(state, { showExplored = true, showPath = true, showDa
       cells.push({
         key: k,
         wall,
+        wallEdges: wall ? [state.grid[r - 1]?.[c], state.grid[r]?.[c + 1], state.grid[r + 1]?.[c], state.grid[r]?.[c - 1]].map((tile) => tile !== '#') : null,
         pellet: !wall && pellets.has(k) && !ghost && !pac,
         coin: !wall && coins.has(k) && !ghost && !pac,
         path: showPath && !wall && pathKeys.has(k) && k !== targetKey && !pac,

@@ -3,9 +3,10 @@ import { Coin, Ghost, Mascot } from './Sprites.jsx';
 
 function Cell({ cell, dir, mouth }) {
   if (cell.wall) {
+    const [top, right, bottom, left] = cell.wallEdges;
     return (
       <div className="cell" data-testid="wall">
-        <div className="cell-wall" />
+        <div className="cell-wall" style={{ borderWidth: `${top ? 2 : 0}px ${right ? 2 : 0}px ${bottom ? 2 : 0}px ${left ? 2 : 0}px`, borderRadius: `${top && left ? 5 : 0}px ${top && right ? 5 : 0}px ${bottom && right ? 5 : 0}px ${bottom && left ? 5 : 0}px` }} />
       </div>
     );
   }
@@ -27,16 +28,16 @@ const MemoCell = memo(Cell, (a, b) => {
   const x = a.cell;
   const y = b.cell;
   return (
-    x.wall === y.wall && x.pellet === y.pellet && x.coin === y.coin && x.path === y.path &&
+    x.wall === y.wall && String(x.wallEdges) === String(y.wallEdges) && x.pellet === y.pellet && x.coin === y.coin && x.path === y.path &&
     x.target === y.target && x.explored === y.explored && x.danger === y.danger && x.pac === y.pac &&
     x.ghost === y.ghost && (!x.pac || (a.dir === b.dir && a.mouth === b.mouth))
   );
 });
 
-export function Maze({ cells, rows, cols, tile, showCoords, crt, label, dir, mouth, overlay }) {
+export function Maze({ cells, rows, cols, showCoords, crt, label, dir, mouth, overlay }) {
   return (
-    // Shrink tiles on narrow screens so the whole maze always fits the width.
-    <div className="maze-wrap" style={{ '--tile': `min(${tile}px, calc((100vw - ${showCoords ? 122 : 100}px) / ${cols}))` }}>
+    // Use the full board area without adding an outer frame or empty margins.
+    <div className="maze-wrap" style={{ '--tile-x': `calc((100cqw - ${showCoords ? 22 : 0}px) / ${cols})`, '--tile-y': `calc((100cqh - ${showCoords ? 22 : 0}px) / ${rows})` }}>
       {showCoords && (
         <div className="maze-cols" aria-hidden="true">
           {Array.from({ length: cols }, (_, i) => (
@@ -56,7 +57,7 @@ export function Maze({ cells, rows, cols, tile, showCoords, crt, label, dir, mou
           className="maze-grid"
           role="img"
           aria-label={label}
-          style={{ gridTemplateColumns: `repeat(${cols}, var(--tile))` }}
+          style={{ gridTemplateColumns: `repeat(${cols}, var(--tile-x))` }}
         >
           {cells.map((cell) => (
             <MemoCell key={cell.key} cell={cell} dir={dir} mouth={mouth} />
