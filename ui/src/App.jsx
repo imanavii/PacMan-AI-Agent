@@ -31,7 +31,7 @@ export default function App({ client: injectedClient } = {}) {
   return (
     <main className="game-app" aria-label="Pac-Agent game dashboard">
       <header className="app-header">
-        <div className="brand"><span className="brand-mark" aria-hidden="true">PAC</span><h1>PAC-AGENT</h1></div>
+        <div className="brand"><span className="brand-mark" aria-hidden="true">PAC</span><h1>Pacman Agent</h1></div>
         <span className="app-subtitle">THE MAZE THAT PLAYS ITSELF</span>
         <span className={`connection ${game.error ? 'offline' : ''}`}>{game.error ? 'Disconnected' : game.loading ? 'Connecting' : 'Local game'}</span>
       </header>
