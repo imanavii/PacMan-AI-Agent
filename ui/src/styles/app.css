@@ -35,7 +35,7 @@ button:focus-visible { outline: 2px solid #ae80ff; outline-offset: 3px; }
 .legend-list li { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 10px; color: #b5bfdc; }
 .legend-list li > :first-child { flex: 0 0 18px; }
 .legend-list small { color: #6f7e9f; font-size: 9px; }
-.legend-dot { width: 5px; height: 5px; background: #ffe35c; border-radius: 50%; transform: scale(.3); }
+.legend-dot { width: 18px; height: 18px; }
 .legend-route { width: 15px; height: 6px; border-radius: 2px; background: #a074ef; }
 .control-panel { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
 .control-main { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -67,7 +67,7 @@ button:focus-visible { outline: 2px solid #ae80ff; outline-offset: 3px; }
 .cell-danger { inset: 0; background: #dc4d6830; }
 .cell-explored { inset: 0; background: #8a5ee733; }
 .cell-path { inset: 35%; background: #ac82f7; border-radius: 2px; }
-.cell-pellet { left: 50%; top: 50%; width: calc(min(var(--tile-x), var(--tile-y)) * .2); height: calc(min(var(--tile-x), var(--tile-y)) * .2); transform: translate(-50%, -50%); background: #ffe363; border-radius: 50%; }
+.cell-pellet { left: 50%; top: 50%; width: min(var(--tile-x), var(--tile-y)); height: min(var(--tile-x), var(--tile-y)); transform: translate(-50%, -50%); }
 .cell-coin { inset: 15%; width: 70%; height: 70%; }
 .cell-target { inset: 12%; border: 1px solid #6ddfa7; }
 .cell-pac { left: 5%; top: 7%; width: 90%; height: 86%; }
@@ -91,8 +91,13 @@ button:focus-visible { outline: 2px solid #ae80ff; outline-offset: 3px; }
   .game-app { padding: 6px; gap: 6px; grid-template-rows: 32px 55px minmax(0, 1fr) 14px; }
   .game-workspace { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6px; }.stats-bar { gap: 5px; }
   .stat-card { padding: 6px 8px; }.stat-card > span { font-size: 10px; }.stat-card strong { font-size: 19px; }.heart { font-size: 22px; }
-  .info-panel { padding: 8px; }.legend-list { grid-template-columns: 1fr; gap: 4px; }.legend-list li { font-size: 9px; }.legend-list li svg { width: 14px; height: 13px; }
+  .info-panel { padding: 8px; }.legend-list { grid-template-columns: 1fr; gap: 4px; }.legend-list li { font-size: 9px; }.legend-list li svg, .legend-list li .sprite { width: 14px; height: 14px; }
   .control-main { gap: 4px; }.joystick-block { flex-basis: 65px; width: 65px; }.joystick { transform: scale(.48); margin-bottom: -65px; }
   .sticker { font-size: 6px; }.display-toggles { grid-template-columns: 1fr 1fr; }.connection { font-size: 9px; }.brand h1 { font-size: 12px; }.app-footer { font-size: 8px; }
   .screen { padding: 0; }
 }
+
+/* PNG sprites (src/assets/sprites): keep pixels crisp at any scale. */
+.sprite { display: block; image-rendering: pixelated; image-rendering: crisp-edges; object-fit: contain; pointer-events: none; user-select: none; }
+.sprite-stack { position: relative; display: inline-block; }
+.sprite-stack > .sprite { position: absolute; inset: 0; width: 100%; height: 100%; }

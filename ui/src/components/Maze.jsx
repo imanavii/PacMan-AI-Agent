@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Coin, Ghost, Mascot } from './Sprites.jsx';
+import { Coin, Ghost, Mascot, Pellet } from './Sprites.jsx';
 
 function Cell({ cell, dir, mouth }) {
   if (cell.wall) {
@@ -15,7 +15,7 @@ function Cell({ cell, dir, mouth }) {
       {cell.danger && <div className="cell-danger" data-testid="danger" />}
       {cell.explored && <div className="cell-explored" data-testid="explored" />}
       {cell.path && <div className="cell-path" data-testid="path" />}
-      {cell.pellet && <div className="cell-pellet" data-testid="pellet" />}
+      {cell.pellet && <Pellet className="cell-pellet" data-testid="pellet" />}
       {cell.coin && <Coin className="cell-coin" />}
       {cell.target && <div className="cell-target" data-testid="target" />}
       {cell.pac && <Mascot className="cell-pac" dir={dir} mouth={mouth} />}

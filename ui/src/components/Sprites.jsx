@@ -1,66 +1,83 @@
-// Pixel-art sprites drawn as crisp SVG. The agent is an original mascot.
+// Pixel-art sprites rendered from the PNG frames in src/assets/sprites.
+// Every frame is 16x16; the .sprite CSS class keeps them crisp when scaled.
 
-const MASCOT_BODY = 'M2 1h6v1H2z M1 2h8v1H1z M0 3h10v4H0z M1 7h8v1H1z';
-const PUPILS = {
-  LEFT: 'M2 3h1v2H2z M6 3h1v2H6z',
-  RIGHT: 'M3 3h1v2H3z M7 3h1v2H7z',
-  UP: 'M2 3h2v1H2z M6 3h2v1H6z',
-  DOWN: 'M2 4h2v1H2z M6 4h2v1H6z',
+const pacFrames = import.meta.glob('../assets/sprites/pacman/*.png', { eager: true, import: 'default' });
+const ghostImgs = import.meta.glob('../assets/sprites/ghosts/*.png', { eager: true, import: 'default' });
+const itemImgs = import.meta.glob('../assets/sprites/items/*.png', { eager: true, import: 'default' });
+
+const pacFrame = (dir, n) => pacFrames[`../assets/sprites/pacman/${dir}-${n}.png`];
+const ghostImg = (name) => ghostImgs[`../assets/sprites/ghosts/${name}.png`];
+const itemImg = (name) => itemImgs[`../assets/sprites/items/${name}.png`];
+
+const DIRS = { UP: 'up', DOWN: 'down', LEFT: 'left', RIGHT: 'right' };
+// Frame 1 = mouth wide open, 2 = half open, 3 = closed.
+const MOUTH_FRAME = { open: 1, half: 2, closed: 3 };
+
+// Ghost body colours used across the UI (see game/derive.js GHOST_COLORS).
+const GHOST_BY_COLOR = {
+  '#E43B44': 'blinky',
+  '#F6757A': 'pinky',
+  '#2CE8F5': 'inky',
+  '#F77622': 'clyde',
 };
-const GHOST_BODY = 'M1 0h1v1H1z M6 0h1v1H6z M2 1h4v1H2z M1 2h6v1H1z M0 3h8v1H0z M1 4h6v1H1z M2 5h4v1H2z M1 6h1v1H1z M6 6h1v1H6z';
+
+function cx(...names) {
+  return names.filter(Boolean).join(' ');
+}
+
+function SpriteImg({ src, className, title, ...rest }) {
+  return (
+    <img
+      src={src}
+      className={cx('sprite', className)}
+      alt={title ?? ''}
+      aria-hidden={title ? undefined : true}
+      draggable={false}
+      {...rest}
+    />
+  );
+}
 
 export function Mascot({ dir = 'RIGHT', mouth = 'open', className, style, width, height, title }) {
+  const d = DIRS[dir] ?? 'right';
+  if (mouth === 'chomp') {
+    // Open frame underneath, closed frame blinking on top (uses .anim-chomp).
+    return (
+      <span
+        className={cx('sprite-stack', className)}
+        style={{ width, height, ...style }}
+        role={title ? 'img' : undefined}
+        aria-label={title}
+        aria-hidden={title ? undefined : true}
+      >
+        <SpriteImg src={pacFrame(d, 1)} />
+        <SpriteImg src={pacFrame(d, 3)} className="anim-chomp" />
+      </span>
+    );
+  }
   return (
-    <svg
+    <SpriteImg
+      src={pacFrame(d, MOUTH_FRAME[mouth] ?? 1)}
       className={className}
       style={style}
       width={width}
       height={height}
-      viewBox="0 0 10 9"
-      shapeRendering="crispEdges"
-      role={title ? 'img' : undefined}
-      aria-label={title}
-      aria-hidden={title ? undefined : true}
-    >
-      <path d={MASCOT_BODY} fill="#FEE761" />
-      <path d="M1 0h1v2H1z M8 0h1v2H8z" fill="#FEAE34" />
-      <path d="M1 8h3v1H1z M6 8h3v1H6z" fill="#F77622" />
-      <path d="M2 3h2v2H2z M6 3h2v2H6z" fill="#FFFFFF" />
-      <path d={PUPILS[dir] ?? PUPILS.RIGHT} fill="#181425" />
-      <path d="M1 5h1v1H1z M8 5h1v1H8z" fill="#F6757A" />
-      {mouth === 'open' ? (
-        <>
-          <path d="M3 5h4v2H3z" fill="#3E2731" />
-          <path d="M4 6h2v1H4z" fill="#E43B44" />
-        </>
-      ) : (
-        <path d="M3 6h4v1H3z" fill="#3E2731" />
-      )}
-      {mouth === 'chomp' && (
-        <>
-          <path className="anim-chomp" d="M3 5h4v2H3z" fill="#3E2731" />
-          <path className="anim-chomp" d="M4 6h2v1H4z" fill="#E43B44" />
-        </>
-      )}
-    </svg>
+      title={title}
+    />
   );
 }
 
-export function Ghost({ body = '#E43B44', eye = '#FFFFFF', className, style, width, height }) {
-  return (
-    <svg className={className} style={style} width={width} height={height} viewBox="0 0 8 7" shapeRendering="crispEdges" aria-hidden="true">
-      <path d={GHOST_BODY} fill={body} />
-      <path d="M2 3h1v1H2z M5 3h1v1H5z" fill={eye} />
-    </svg>
-  );
+// `eye` is still accepted so existing callers keep working; the PNGs carry their own eyes.
+// eslint-disable-next-line no-unused-vars
+export function Ghost({ body = '#E43B44', eye, frightened = false, className, style, width, height }) {
+  const name = frightened ? 'blue_ghost' : (GHOST_BY_COLOR[String(body).toUpperCase()] ?? 'blinky');
+  return <SpriteImg src={ghostImg(name)} className={className} style={style} width={width} height={height} />;
 }
 
 export function Coin({ className, style, width, height }) {
-  return (
-    <svg className={className} style={style} width={width} height={height} viewBox="0 0 6 6" shapeRendering="crispEdges" aria-hidden="true">
-      <path d="M2 0h2v1H2z M1 1h4v1H1z M0 2h6v2H0z M1 4h4v1H1z M2 5h2v1H2z" fill="#FEAE34" />
-      <path d="M3 1h1v4H3z" fill="#F77622" />
-      <path d="M2 2h1v1H2z" fill="#FEE761" />
-    </svg>
-  );
+  return <SpriteImg src={itemImg('strawberry')} className={className} style={style} width={width} height={height} />;
+}
+
+export function Pellet(props) {
+  return <SpriteImg src={itemImg('dot')} {...props} />;
 }

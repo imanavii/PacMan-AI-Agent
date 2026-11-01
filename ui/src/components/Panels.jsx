@@ -1,4 +1,4 @@
-import { Coin, Ghost, Mascot } from './Sprites.jsx';
+import { Coin, Ghost, Mascot, Pellet } from './Sprites.jsx';
 import { pad } from '../game/derive.js';
 
 export function AnalysisPanel({ state }) {
@@ -20,8 +20,8 @@ export function LegendPanel() {
     <ul className="legend-list">
       <li><Mascot width={20} height={18} dir="LEFT" /><span>Agent (Pac-Man)</span></li>
       {[['red', '#E43B44'], ['pink', '#F6757A'], ['cyan', '#2CE8F5'], ['orange', '#F77622']].map(([name, color]) => <li key={name}><Ghost width={20} height={18} body={color} /><span>{name[0].toUpperCase() + name.slice(1)} ghost</span></li>)}
-      <li><span className="legend-dot" /><span>Pellet <small>+10</small></span></li>
-      <li><Coin width={18} height={18} /><span>Coin <small>+50</small></span></li>
+      <li><Pellet className="legend-dot" width={18} height={18} /><span>Pellet <small>+10</small></span></li>
+      <li><Coin width={18} height={18} /><span>Fruit <small>+50</small></span></li>
       <li><span className="legend-route" /><span>Planned path</span></li>
     </ul>
   </section>;
